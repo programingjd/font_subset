@@ -13,3 +13,5 @@ Thumbs.db
 /.hg
 
 local.properties
+
+/font_subset-*.jar

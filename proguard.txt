@@ -1,0 +1,10 @@
+-libraryjars <java.home>/lib/rt.jar
+
+-keepattributes SourceFile, LineNumberTable
+
+-optimizations !method/inlining/*
+
+
+-keep public class * {
+	public protected *;
+}

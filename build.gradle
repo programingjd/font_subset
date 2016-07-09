@@ -4,6 +4,7 @@ buildscript {
   }
   dependencies {
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+    classpath 'net.sf.proguard:proguard-gradle:5.2.1'
     classpath 'org.jsoup:jsoup:1.9.2'
   }
 }
@@ -34,6 +35,21 @@ sourceSets {
       srcDir 'sfntly/java/src'
     }
   }
+}
+
+jar {
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  from {
+    configurations.runtime.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+}
+
+task proguard(type: proguard.gradle.ProGuardTask) {
+  configuration 'proguard.txt'
+  injars "build/libs/font_subset-${version}.jar"
+  outjars "font_subset-${version}.jar"
 }
 
 publishing {
