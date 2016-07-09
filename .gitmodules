@@ -1,4 +1,0 @@
-[submodule "sfntly"]
-	path = sfntly
-	url = https://github.com/googlei18n/sfntly.git
-  branch = master
