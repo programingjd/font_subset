@@ -25,7 +25,7 @@ repositories {
 
 dependencies {
   compile files('sfntly/java/lib/icu4j-4_8_1_1.jar', 'sfntly/java/lib/icu4j-charset-4_8_1_1.jar')
-
+  compile files('sfntly/java/lib/jcommander-1.27.jar')
 }
 
 sourceSets {
