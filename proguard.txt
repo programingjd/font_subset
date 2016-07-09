@@ -2,9 +2,11 @@
 
 -keepattributes SourceFile, LineNumberTable
 
--optimizations !method/inlining/*
+-dontobfuscate
 
+-dontoptimize
+#-optimizations !method/inlining/*
 
--keep public class * {
-	public protected *;
+-keep public class info.jdavid.font.subset.Extractor {
+	public static void main(java.lang.String[]);
 }

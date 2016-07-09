@@ -32,7 +32,7 @@ dependencies {
 sourceSets {
   main {
     java {
-      srcDir 'sfntly/java/src'
+      srcDirs = ['sfntly/java/src', 'src/java']
     }
   }
 }
