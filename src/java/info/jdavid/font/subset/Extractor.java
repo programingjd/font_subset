@@ -3,6 +3,7 @@ package info.jdavid.font.subset;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,7 +60,7 @@ public class Extractor {
   }
 
   public static void main(final String[] args) throws IOException {
-    final FileInputStream input = new FileInputStream(new File("NotoSans-Regular.ttf"));
+    final FileInputStream input = new FileInputStream(new File("DryBrush.ttf"));
     try {
       final byte[] buffer = new byte[4096];
       final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -71,6 +72,9 @@ public class Extractor {
       final byte[] bytes = new Extractor(output.toByteArray()).woff("abcdefghijklmnopqrstuvwxyz");
       if (bytes.length < 1024) throw new RuntimeException();
       System.out.println(bytes.length);
+      final FileOutputStream fos = new FileOutputStream("subset.woff");
+      fos.write(bytes);
+      fos.close();
     }
     finally {
       try {

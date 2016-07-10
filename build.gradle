@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'info.jdavid.font.subset'
-version '1.0.0'
+version '0.9.0'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -47,16 +47,45 @@ jar {
   }
 }
 
+task runExtractorTest(type: JavaExec) {
+  classpath = files('font_subset-1.0.0.jar')
+  main = 'info.jdavid.font.subset.Extractor'
+}
+
 task proguard(type: proguard.gradle.ProGuardTask) {
   configuration 'proguard.txt'
-  injars "build/libs/font_subset-${version}.jar"
-  outjars "font_subset-${version}.jar"
+  injars "build/libs/extractor-${version}.jar"
+  outjars "extractor-${version}.jar"
+}
+
+test {
+  doLast {
+    def readme = file('README.md')
+    def badge = { String label, String text, String color ->
+      "https://img.shields.io/badge/_${label}_-_${text}-${color}.png?style=flat"
+    }
+    String v = project.version
+    def download =
+      "https://bintray.com/artifact/download/programingjd/maven/info/jdavid/font/subset/extractor/$v/extractor-${v}.jar"
+    readme.readLines().withIndex().collect { line, i ->
+      switch (i) {
+        case 0:
+          return "![jcenter](${badge('jcenter',v,'6688ff')})"
+        case 10: return "[Download](${download}) the latest jar."
+        case 20: return "  <version>${v}</version>"
+        case 33: return "  compile 'info.jdavid.font.subset:extractor${v}'"
+        default: return line
+      }
+    }.join('\n').with { readme.text = it }
+  }
 }
 
 publishing {
   publications {
     mavenJava(MavenPublication) {
-      from components.java
+      artifact {
+        file("extractor-${version}.jar")
+      }
     }
   }
   repositories {
@@ -64,5 +93,38 @@ publishing {
       url "$buildDir/repo"
     }
   }
+}
+
+bintray {
+  user = 'programingjd'
+  key = getBintrayApiKey()
+  dryRun = false
+  publish = true
+  publications = ['mavenJava']
+  pkg {
+    repo = 'maven'
+    name = 'info.jdavid.font.subset'
+    websiteUrl = 'https://github.com/programingjd/font_subset'
+    issueTrackerUrl = 'https://github.com/programingjd/font_subset/issues'
+    vcsUrl = 'https://github.com/programingjd/font_subset.git'
+    githubRepo = 'programingjd/font_subset'
+    githubReleaseNotesFile = 'README.md'
+    licenses = ['Apache-2.0']
+    labels = ['font','subset','ttf','woff']
+    publicDownloadNumbers = true
+    version {
+      name = project.version
+      mavenCentralSync {
+        sync = false
+      }
+    }
+  }
+}
+
+tasks.bintrayUpload.dependsOn tasks.check
+
+def getBintrayApiKey() {
+  def f = new File("$projectDir/local.properties")
+  f.text.splitEachLine('=', { if (it && it[0] == 'bintrayApiKey') return it[1] })
 }
 
