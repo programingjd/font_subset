@@ -56,9 +56,6 @@ task proguard(type: proguard.gradle.ProGuardTask) {
   configuration 'proguard.txt'
   injars "build/libs/extractor-${version}.jar"
   outjars "extractor-${version}.jar"
-}
-
-test {
   doLast {
     def readme = file('README.md')
     def badge = { String label, String text, String color ->
@@ -121,7 +118,7 @@ bintray {
   }
 }
 
-tasks.bintrayUpload.dependsOn tasks.check
+tasks.bintrayUpload.dependsOn tasks.proguard
 
 def getBintrayApiKey() {
   def f = new File("$projectDir/local.properties")
