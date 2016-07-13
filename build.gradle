@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'info.jdavid.font.subset'
-version '0.9.0'
+version '1.0.0'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -77,12 +77,33 @@ task proguard(type: proguard.gradle.ProGuardTask) {
   }
 }
 
+javadoc {
+  source = [ 'src/java' ]
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+  classifier = 'sources'
+  from files([ 'src/java' ])
+}
+
+artifacts {
+  archives sourcesJar, javadocJar
+}
+
+
 publishing {
   publications {
     mavenJava(MavenPublication) {
       artifact {
         file("extractor-${version}.jar")
       }
+      artifact sourcesJar
+      artifact javadocJar
     }
   }
   repositories {
