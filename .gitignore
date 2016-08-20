@@ -15,4 +15,4 @@ Thumbs.db
 local.properties
 
 /extractor-*.jar
-/*.woff
+/subset.*

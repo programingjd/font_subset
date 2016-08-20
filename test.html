@@ -2,15 +2,23 @@
 <html><head><meta charset="UTF-8"><title>Test</title>
 <style>
 @font-face {
-  font-family: subset;
+  font-family: subset1;
   src: url(subset.woff) format('woff');
 }
-body {
-  font: 24px subset;
+@font-face {
+  font-family: subset2;
+  src: url(subset.ttf) format('truetype');
+}
+#subset1 {
+  font: 24px subset1;
+}
+#subset2 {
+  font: 24px subset2;
 }
 </style>
 </head>
 <body>
-Some text. And some more.
+<div id="subset1">Some text. And some more.</div>
+<div id="subset2">Some text. And some more.</div>
 </body>
 </html>

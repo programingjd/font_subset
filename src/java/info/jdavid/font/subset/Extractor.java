@@ -59,6 +59,25 @@ public class Extractor {
     return out.toByteArray();
   }
 
+  public byte[] ttf(final String str) throws IOException {
+    //-h -e -b64 "abcdef" font.ttf
+    // woff = false, strip = true, encode = true
+    final List<CMapTable.CMapId> cmapIds = new ArrayList<>();
+    cmapIds.add(CMapTable.CMapId.WINDOWS_BMP);
+    final Subsetter glyphSubsetter = new RenumberingSubsetter(font, factory);
+    glyphSubsetter.setCMaps(cmapIds, 1);
+    glyphSubsetter.setGlyphs(GlyphCoverage.getGlyphCoverage(font, str));
+    glyphSubsetter.setRemoveTables(GLYPH_REMOVABLE_TABLES);
+    final Font subset = glyphSubsetter.subset().build();
+    final Subsetter hintSubsetter = new HintStripper(subset, factory);
+    hintSubsetter.setRemoveTables(HINT_REMOVABLE_TABLES);
+    final Font stripped = hintSubsetter.subset().build();
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    factory.serializeFont(stripped, out);
+    out.close();
+    return out.toByteArray();
+  }
+
   public static void main(final String[] args) throws IOException {
     final FileInputStream input = new FileInputStream(new File("DryBrush.ttf"));
     try {
@@ -69,12 +88,20 @@ public class Extractor {
         output.write(buffer, 0, len);
       }
       output.close();
-      final byte[] bytes = new Extractor(output.toByteArray()).woff("abcdefghijklmnopqrstuvwxyz");
-      if (bytes.length < 1024) throw new RuntimeException();
-      System.out.println(bytes.length);
-      final FileOutputStream fos = new FileOutputStream("subset.woff");
-      fos.write(bytes);
-      fos.close();
+      final Extractor extractor = new Extractor(output.toByteArray());
+      final byte[] bytes1 = extractor.woff("abcdefghijklmnopqrstuvwxyz");
+      if (bytes1.length < 1024) throw new RuntimeException();
+      System.out.println(bytes1.length);
+      final FileOutputStream fos1 = new FileOutputStream("subset.woff");
+      fos1.write(bytes1);
+      fos1.close();
+
+      final byte[] bytes2 = extractor.ttf("abcdefghijklmnopqrstuvwxyz");
+      if (bytes2.length < 1024) throw new RuntimeException();
+      System.out.println(bytes2.length);
+      final FileOutputStream fos2 = new FileOutputStream("subset.ttf");
+      fos2.write(bytes2);
+      fos2.close();
     }
     finally {
       try {
