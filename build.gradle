@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'info.jdavid.font.subset'
-version '1.1.0'
+version '1.1.1'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -54,8 +54,8 @@ task runExtractorTest(type: JavaExec) {
 
 task proguard(type: proguard.gradle.ProGuardTask) {
   configuration 'proguard.txt'
-  injars "build/libs/extractor-${version}.jar"
-  outjars "extractor-${version}.jar"
+  injars "build/libs/extractor-${project.version}.jar"
+  outjars "extractor-${project.version}.jar"
   doLast {
     def readme = file('README.md')
     def badge = { String label, String text, String color ->

@@ -40,19 +40,31 @@ public class Extractor {
     font = factory.loadFonts(bytes)[0];
   }
 
+  private Font strip(final String str) throws IOException {
+    final List<CMapTable.CMapId> cmapIds = new ArrayList<>();
+    cmapIds.add(CMapTable.CMapId.WINDOWS_BMP);
+    final Font subset;
+    if (str != null) {
+      final Subsetter glyphSubsetter = new RenumberingSubsetter(font, factory);
+      glyphSubsetter.setCMaps(cmapIds, 1);
+      glyphSubsetter.setGlyphs(GlyphCoverage.getGlyphCoverage(font, str));
+      glyphSubsetter.setRemoveTables(GLYPH_REMOVABLE_TABLES);
+      subset = glyphSubsetter.subset().build();
+    }
+    else {
+      final Subsetter glyphSubsetter = new HintStripper(font, factory);
+      glyphSubsetter.setRemoveTables(GLYPH_REMOVABLE_TABLES);
+      subset = glyphSubsetter.subset().build();
+    }
+    final Subsetter hintSubsetter = new HintStripper(subset, factory);
+    hintSubsetter.setRemoveTables(HINT_REMOVABLE_TABLES);
+    return hintSubsetter.subset().build();
+  }
+
   public byte[] woff(final String str) throws IOException {
     //-w -h -e -b64 "abcdef" font.ttf
     // woff = true, strip = true, encode = true
-    final List<CMapTable.CMapId> cmapIds = new ArrayList<>();
-    cmapIds.add(CMapTable.CMapId.WINDOWS_BMP);
-    final Subsetter glyphSubsetter = new RenumberingSubsetter(font, factory);
-    glyphSubsetter.setCMaps(cmapIds, 1);
-    glyphSubsetter.setGlyphs(GlyphCoverage.getGlyphCoverage(font, str));
-    glyphSubsetter.setRemoveTables(GLYPH_REMOVABLE_TABLES);
-    final Font subset = glyphSubsetter.subset().build();
-    final Subsetter hintSubsetter = new HintStripper(subset, factory);
-    hintSubsetter.setRemoveTables(HINT_REMOVABLE_TABLES);
-    final Font stripped = hintSubsetter.subset().build();
+    final Font stripped = strip(str);
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     new WoffWriter().convert(stripped).copyTo(out);
     out.close();
@@ -62,16 +74,7 @@ public class Extractor {
   public byte[] ttf(final String str) throws IOException {
     //-h -e -b64 "abcdef" font.ttf
     // woff = false, strip = true, encode = true
-    final List<CMapTable.CMapId> cmapIds = new ArrayList<>();
-    cmapIds.add(CMapTable.CMapId.WINDOWS_BMP);
-    final Subsetter glyphSubsetter = new RenumberingSubsetter(font, factory);
-    glyphSubsetter.setCMaps(cmapIds, 1);
-    glyphSubsetter.setGlyphs(GlyphCoverage.getGlyphCoverage(font, str));
-    glyphSubsetter.setRemoveTables(GLYPH_REMOVABLE_TABLES);
-    final Font subset = glyphSubsetter.subset().build();
-    final Subsetter hintSubsetter = new HintStripper(subset, factory);
-    hintSubsetter.setRemoveTables(HINT_REMOVABLE_TABLES);
-    final Font stripped = hintSubsetter.subset().build();
+    final Font stripped = strip(str);
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     factory.serializeFont(stripped, out);
     out.close();
@@ -102,6 +105,13 @@ public class Extractor {
       final FileOutputStream fos2 = new FileOutputStream("subset.ttf");
       fos2.write(bytes2);
       fos2.close();
+
+      final byte[] bytes3 = extractor.woff(null);
+      if (bytes2.length < 1024) throw new RuntimeException();
+      System.out.println(bytes3.length);
+      final FileOutputStream fos3 = new FileOutputStream("converted.woff");
+      fos3.write(bytes3);
+      fos3.close();
     }
     finally {
       try {
