@@ -3,14 +3,14 @@ buildscript {
     jcenter()
   }
   dependencies {
-    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
-    classpath 'net.sf.proguard:proguard-gradle:5.2.1'
-    classpath 'org.jsoup:jsoup:1.9.2'
+    classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
+    classpath 'net.sf.proguard:proguard-gradle:5.3.1'
+    classpath 'org.jsoup:jsoup:1.10.1'
   }
 }
 
 group 'info.jdavid.font.subset'
-version '1.1.1'
+version '1.1.2'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
