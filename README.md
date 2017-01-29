@@ -1,4 +1,4 @@
-![jcenter](https://img.shields.io/badge/_jcenter_-_1.1.2-6688ff.png?style=flat)
+![jcenter](https://img.shields.io/badge/_jcenter_-_1.2.0-6688ff.png?style=flat)
 # Font Subset Extractor
 Creates woff font files from truetype files, including only a subset of the glyphs.<br>
 This is based on Google's [sfntly](https://github.com/googlei18n/sfntly).
@@ -8,7 +8,7 @@ This is based on Google's [sfntly](https://github.com/googlei18n/sfntly).
 The maven artifacts are on [Bintray](https://bintray.com/programingjd/maven/info.jdavid.font.subset/view)
 and [jcenter](https://bintray.com/search?query=info.jdavid.font.subset).
 
-[Download](https://bintray.com/artifact/download/programingjd/maven/info/jdavid/font/subset/extractor/1.1.2/extractor-1.1.2.jar) the latest jar.
+[Download](https://bintray.com/artifact/download/programingjd/maven/info/jdavid/font/subset/extractor/1.2.0/extractor-1.2.0.jar) the latest jar.
 
 __Maven__
 
@@ -18,7 +18,7 @@ Include [those settings](https://bintray.com/repo/downloadMavenRepoSettingsFile/
 <dependency>
   <groupId>info.jdavid.font.subset</groupId>
   <artifactId>extractor</artifactId>
-  <version>1.1.2</version>
+  <version>1.2.0</version>
 </dependency>
 ```
 __Gradle__
@@ -31,7 +31,7 @@ repositories {
 ```
 ```
 dependencies {
-  compile 'info.jdavid.font.subset:extractor1.1.2'
+  compile 'info.jdavid.font.subset:extractor1.2.0'
 }
 ```
 

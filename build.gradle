@@ -10,7 +10,7 @@ buildscript {
 }
 
 group 'info.jdavid.font.subset'
-version '1.1.2'
+version '1.2.0'
 
 apply plugin: 'java'
 apply plugin: 'maven-publish'
@@ -25,6 +25,7 @@ repositories {
 }
 
 dependencies {
+  //compile 'org.b1.pack:lzma-sdk-4j:9.22.0'
   compile files('sfntly/java/lib/icu4j-4_8_1_1.jar', 'sfntly/java/lib/icu4j-charset-4_8_1_1.jar')
   compile files('sfntly/java/lib/jcommander-1.27.jar')
 }
@@ -33,6 +34,7 @@ sourceSets {
   main {
     java {
       srcDirs = ['sfntly/java/src', 'src/java']
+      exclude '**/info/jdavid/font/subset/Woff2Writer.java'
     }
   }
 }
