@@ -137,6 +137,8 @@ public class Woff2Writer {
     index += writableFontData.writeUShort(index, 0);  // reserved
     int uncompressedFontSize = computeUncompressedSize(entries);
     index += writableFontData.writeULong(index, uncompressedFontSize);
+    int compressedFontSize = computeCompressedFontSize(entries);
+    index += writableFontData.writeULong(index, compressedFontSize);
     index += writableFontData.writeFixed(index, version);
     index += writableFontData.writeULong(index, 0);  // metaOffset
     index += writableFontData.writeULong(index, 0);  // metaLength

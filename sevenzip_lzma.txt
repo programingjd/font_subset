@@ -1,0 +1,2 @@
+sevenzip package from official public domain lib by Igor Pavlov:
+http://www.7-zip.org/sdk.html

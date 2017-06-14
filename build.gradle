@@ -25,7 +25,7 @@ repositories {
 }
 
 dependencies {
-  //compile 'org.b1.pack:lzma-sdk-4j:9.22.0'
+  compile 'org.brotli:dec:0.1.2'
   compile files('sfntly/java/lib/icu4j-4_8_1_1.jar', 'sfntly/java/lib/icu4j-charset-4_8_1_1.jar')
   compile files('sfntly/java/lib/jcommander-1.27.jar')
 }
@@ -33,7 +33,7 @@ dependencies {
 sourceSets {
   main {
     java {
-      srcDirs = ['sfntly/java/src', 'src/java']
+      srcDirs = ['sfntly/java/src', 'sevenzip/src/java',  'src/java']
       exclude '**/info/jdavid/font/subset/Woff2Writer.java'
     }
   }

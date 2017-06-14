@@ -78,6 +78,16 @@ public class Extractor {
     return out.toByteArray();
   }
 
+  public byte[] woff2(final String str) throws IOException {
+    //-w -h -e -b64 "abcdef" font.ttf
+    // woff = true, strip = true, encode = true
+    final Font stripped = strip(str);
+    final ByteArrayOutputStream out = new ByteArrayOutputStream();
+    new Woff2Writer().convert(stripped).copyTo(out);
+    out.close();
+    return out.toByteArray();
+  }
+
   private static CMap getBestCMap(CMapTable cmapTable) {
     for (CMap cmap : cmapTable) {
       if (cmap.format() == CMap.CMapFormat.Format12.value()) {
@@ -154,10 +164,10 @@ public class Extractor {
       }
       output.close();
       final Extractor extractor = new Extractor(output.toByteArray());
-      final byte[] bytes1 = extractor.woff("abcdefghijklmnopqrstuvwxyz");
-      if (bytes1.length < 1024) throw new RuntimeException();
+      final byte[] bytes1 = extractor.woff2(" l"); //abcdefghijklmnopqrstuvwxyz");
+      //if (bytes1.length < 1024) throw new RuntimeException();
       System.out.println(bytes1.length);
-      final FileOutputStream fos1 = new FileOutputStream("subset.woff");
+      final FileOutputStream fos1 = new FileOutputStream("subset.woff2");
       fos1.write(bytes1);
       fos1.close();
 
