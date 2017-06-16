@@ -154,7 +154,7 @@ public class Extractor {
   }
 
   public static void main(final String[] args) throws IOException {
-    final FileInputStream input = new FileInputStream(new File("DryBrush.ttf"));
+    final FileInputStream input = new FileInputStream(new File("exclam.ttf"));
     try {
       final byte[] buffer = new byte[4096];
       final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -164,15 +164,15 @@ public class Extractor {
       }
       output.close();
       final Extractor extractor = new Extractor(output.toByteArray());
-      final byte[] bytes1 = extractor.woff2(" l"); //abcdefghijklmnopqrstuvwxyz");
+      final byte[] bytes1 = extractor.woff2("!"); //abcdefghijklmnopqrstuvwxyz");
       //if (bytes1.length < 1024) throw new RuntimeException();
       System.out.println(bytes1.length);
-      final FileOutputStream fos1 = new FileOutputStream("subset.woff2");
+      final FileOutputStream fos1 = new FileOutputStream("exclam.woff2");
       fos1.write(bytes1);
       fos1.close();
-
+/*
       final byte[] bytes2 = extractor.ttf("abcdefghijklmnopqrstuvwxyz");
-      if (bytes2.length < 1024) throw new RuntimeException();
+      //if (bytes2.length < 1024) throw new RuntimeException();
       System.out.println(bytes2.length);
       final FileOutputStream fos2 = new FileOutputStream("subset.ttf");
       fos2.write(bytes2);
@@ -185,11 +185,11 @@ public class Extractor {
 //      final FileOutputStream fos3 = new FileOutputStream("subset.woff2");
 //      fos3.write(bytes3);
 //      fos3.close();
-
+*/
       final byte[] bytes4 = extractor.woff(null);
-      if (bytes4.length < 1024) throw new RuntimeException();
+      //if (bytes4.length < 1024) throw new RuntimeException();
       System.out.println(bytes4.length);
-      final FileOutputStream fos4 = new FileOutputStream("converted.woff");
+      final FileOutputStream fos4 = new FileOutputStream("exclam.woff");
       fos4.write(bytes4);
       fos4.close();
 

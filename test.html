@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Test</title>
 <style>
+body {
+  font-size: 48px;
+}
 @font-face {
   font-family: subset1;
-  src: url(subset.woff) format('woff');
+  src: url(exclam.woff) format('woff');
 }
 @font-face {
   font-family: subset2;
-  src: url(subset.ttf) format('truetype');
+  src: url(exclam.ttf) format('truetype');
 }
 @font-face {
   font-family: subset3;
-  src: url(subset.woff2) format('woff2');
+  src: url(exclam.woff2) format('woff2');
 }
 #subset1 {
-  font: 24px subset1;
+  font-family: subset1;
 }
 #subset2 {
-  font: 24px subset2;
+  font-family: subset2;
 }
 #subset3 {
-  font: 24px subset3;
+  font-family: subset3;
 }
 </style>
 </head>
 <body>
-<div id="subset1">Some text. And some more.</div>
-<div id="subset2">Some text. And some more.</div>
-<div id="subset3">lSome text. And some more.</div>
+<div id="subset1">Woff Some text. And some more!</div>
+<div id="subset2">TT Some text. And some more!</div>
+<div id="subset3">Woff2 lSome text. And some more!</div>
 </body>
 </html>

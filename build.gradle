@@ -4,8 +4,8 @@ buildscript {
   }
   dependencies {
     classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
-    classpath 'net.sf.proguard:proguard-gradle:5.3.1'
-    classpath 'org.jsoup:jsoup:1.10.1'
+    classpath 'net.sf.proguard:proguard-gradle:5.3.3'
+    classpath 'org.jsoup:jsoup:1.10.3'
   }
 }
 
@@ -16,7 +16,6 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-// Keep at 1.6 for Android
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
