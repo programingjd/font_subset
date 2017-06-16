@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import SevenZip.Compression.LZMA.Encoder;
+import sevenzip.Compression.LZMA.Encoder;
 import com.google.typography.font.sfntly.Font;
 import com.google.typography.font.sfntly.Tag;
 import com.google.typography.font.sfntly.data.WritableFontData;
