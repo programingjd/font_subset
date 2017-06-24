@@ -28,6 +28,7 @@ import com.google.typography.font.tools.subsetter.HintStripper;
 import com.google.typography.font.tools.subsetter.RenumberingSubsetter;
 import com.google.typography.font.tools.subsetter.Subsetter;
 
+
 public class Extractor {
 
   private final FontFactory factory = FontFactory.getInstance();
@@ -154,7 +155,7 @@ public class Extractor {
   }
 
   public static void main(final String[] args) throws IOException {
-    final FileInputStream input = new FileInputStream(new File("exclam.ttf"));
+    final FileInputStream input = new FileInputStream(new File("m:/exclam.ttf"));
     try {
       final byte[] buffer = new byte[4096];
       final ByteArrayOutputStream output = new ByteArrayOutputStream();
@@ -167,7 +168,7 @@ public class Extractor {
       final byte[] bytes1 = extractor.woff2("!"); //abcdefghijklmnopqrstuvwxyz");
       //if (bytes1.length < 1024) throw new RuntimeException();
       System.out.println(bytes1.length);
-      final FileOutputStream fos1 = new FileOutputStream("exclam.woff2");
+      final FileOutputStream fos1 = new FileOutputStream("m:/exclam.woff2");
       fos1.write(bytes1);
       fos1.close();
 /*
@@ -186,12 +187,12 @@ public class Extractor {
 //      fos3.write(bytes3);
 //      fos3.close();
 */
-      final byte[] bytes4 = extractor.woff(null);
-      //if (bytes4.length < 1024) throw new RuntimeException();
-      System.out.println(bytes4.length);
-      final FileOutputStream fos4 = new FileOutputStream("exclam.woff");
-      fos4.write(bytes4);
-      fos4.close();
+//      final byte[] bytes4 = extractor.woff(null);
+//      //if (bytes4.length < 1024) throw new RuntimeException();
+//      System.out.println(bytes4.length);
+//      final FileOutputStream fos4 = new FileOutputStream("m:/exclam.woff");
+//      fos4.write(bytes4);
+//      fos4.close();
 
 //      final byte[] bytes5 = extractor.woff2(null);
 //      if (bytes5.length < 1024) throw new RuntimeException();

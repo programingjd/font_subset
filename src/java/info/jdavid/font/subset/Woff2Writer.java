@@ -4,29 +4,29 @@ package info.jdavid.font.subset;
 // https://chromium.googlesource.com/external/font-compression-reference/+/
 // 5ce8fad3ab9824f9f4d5fb4768c313b6309e94e3/src/com/google/typography/font/compression/Woff2Writer.java
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
-import sevenzip.Compression.LZMA.Encoder;
 import com.google.typography.font.sfntly.Font;
 import com.google.typography.font.sfntly.Tag;
 import com.google.typography.font.sfntly.data.WritableFontData;
 import com.google.typography.font.sfntly.table.Table;
 import com.google.typography.font.sfntly.table.core.FontHeaderTable;
+import org.meteogroup.jbrotli.Brotli;
+import org.meteogroup.jbrotli.BrotliStreamCompressor;
+import org.meteogroup.jbrotli.libloader.BrotliLibraryLoader;
+
 
 public class Woff2Writer {
+
   private static final long SIGNATURE = 0x774f4632;
-  private static final int WOFF2_HEADER_SIZE = 44;
-  private static final int TABLE_ENTRY_SIZE = 5 * 4;
+  private static final int WOFF2_HEADER_SIZE = 48;
   private static final int FLAG_CONTINUE_STREAM = 1 << 4;
   private static final int FLAG_APPLY_TRANSFORM = 1 << 5;
-  private final boolean longForm = false;
 
   private static final Map<Integer, Integer> TRANSFORM_MAP = createTransformMap();
   private static Map<Integer, Integer> createTransformMap() {
@@ -169,16 +169,11 @@ public class Woff2Writer {
   }
 
   private int computeDirectoryLength(final List<TableDirectoryEntry> entries) {
-    if (longForm) {
-      return TABLE_ENTRY_SIZE * entries.size();
+    int index = 0;
+    for (final TableDirectoryEntry entry: entries) {
+      index += entry.writeEntry(null, index);
     }
-    else {
-      int index = 0;
-      for (final TableDirectoryEntry entry: entries) {
-        index += entry.writeEntry(null, index);
-      }
-      return index;
-    }
+    return index;
   }
 
   private int align4(final int value) {
@@ -202,6 +197,25 @@ public class Woff2Writer {
       index = align4(index);
     }
     return index;
+  }
+
+  // Note: if writableFontData is null, just return the size
+  private static byte[] base128(final long value) {
+    final ByteArrayOutputStream out = new ByteArrayOutputStream(64);
+    int size = 1;
+    long tmpValue = value;
+    while (tmpValue >= 128) {
+      size += 1;
+      tmpValue = tmpValue >> 7;
+    }
+    for (int i=0; i<size; i++) {
+      int b = (int)(value >> (7 * (size - i - 1))) & 0x7f;
+      if (i < size - 1) {
+        b |= 0x80;
+      }
+      out.write((byte)b);
+    }
+    return out.toByteArray();
   }
 
   // Note: if writableFontData is null, just return the size
@@ -249,52 +263,39 @@ public class Woff2Writer {
     }
 
     public int writeEntry(final WritableFontData writableFontData, final int offset) {
-      if (longForm) {
-        int index = offset;
-        if (writableFontData != null) {
-          index += writableFontData.writeULong(index, tag);
-          index += writableFontData.writeULong(index, flags);
-          index += writableFontData.writeULong(index, bytes.length);
-          index += writableFontData.writeULong(index, transformLength);
-          /*index +=*/ writableFontData.writeULong(index, origLength);
-        }
-        return TABLE_ENTRY_SIZE;
+      int index = offset;
+      int flag_byte = 0x3f;
+      if (KNOWN_TABLES.containsKey((int)tag)) {
+        flag_byte = KNOWN_TABLES.get((int)tag);
       }
-      else {
-        int index = offset;
-        int flag_byte = 0x1f;
-        if (KNOWN_TABLES.containsKey((int)tag)) {
-          flag_byte = KNOWN_TABLES.get((int)tag);
-        }
-        if ((flags & FLAG_APPLY_TRANSFORM) != 0) {
-          flag_byte |= 0x20;
-        }
-        if ((flags & FLAG_CONTINUE_STREAM) != 0) {
-          flag_byte |= 0xc0;
-        }
-        else {
-          flag_byte |= (flags & 3) << 6;
-        }
-        if (writableFontData != null) {
+      if ((flags & FLAG_APPLY_TRANSFORM) != 0) {
+        flag_byte |= 0x20;
+      }
+      if ((flags & FLAG_CONTINUE_STREAM) != 0) {
+        flag_byte |= 0xc0;
+      }
+//      else {
+//        flag_byte |= (flags & 3) << 6;
+//      }
+      if (writableFontData != null) {
 //          System.out.printf("%d: tag = %08x, flag = %02x\n", offset, tag, flag_byte);
-          writableFontData.writeByte(index, (byte)flag_byte);
-        }
-        index += 1;
-        if ((flag_byte & 0x1f) == 0x1f) {
-          if (writableFontData != null) {
-            writableFontData.writeULong(index, tag);
-          }
-          index += 4;
-        }
-        index += writeBase128(writableFontData, origLength, index);
-        if ((flag_byte & 0x20) != 0) {
-          index += writeBase128(writableFontData, transformLength, index);
-        }
-        if ((flag_byte & 0xc0) == 0x40 || (flag_byte & 0xc0) == 0x80) {
-          index += writeBase128(writableFontData, bytes.length, index);
-        }
-        return index - offset;
+        writableFontData.writeByte(index, (byte)flag_byte);
       }
+      index += 1;
+      if ((flag_byte & 0x1f) == 0x1f) {
+        if (writableFontData != null) {
+          writableFontData.writeULong(index, tag);
+        }
+        index += 4;
+      }
+      index += writeBase128(writableFontData, origLength, index);
+      if ((flag_byte & 0x20) != 0) {
+        index += writeBase128(writableFontData, transformLength, index);
+      }
+      if ((flag_byte & 0xc0) == 0x40 || (flag_byte & 0xc0) == 0x80) {
+        index += writeBase128(writableFontData, bytes.length, index);
+      }
+      return index - offset;
     }
 
     public int writeData(final WritableFontData writableFontData, final int offset) {
@@ -304,29 +305,37 @@ public class Woff2Writer {
 
   }
 
+//  private static byte[] compress(final byte[] input) {
+//    try {
+//      final ByteArrayInputStream in = new ByteArrayInputStream(input);
+//      final ByteArrayOutputStream out = new ByteArrayOutputStream();
+//      final Encoder encoder = new Encoder();
+//      encoder.SetAlgorithm(2);
+//      encoder.SetDictionarySize(1 << 23);
+//      encoder.SetNumFastBytes(128);
+//      encoder.SetMatchFinder(1);
+//      encoder.SetLcLpPb(3, 0, 2);
+//      encoder.SetEndMarkerMode(true);
+//      encoder.WriteCoderProperties(out);
+//      for (int i=0; i<8; i++) {
+//        out.write((int) ((long) -1 >>> (8 * i)) & 0xFF);
+//      }
+//      encoder.Code(in, out, -1, -1, null);
+//      out.flush();
+//      out.close();
+//      return out.toByteArray();
+//    }
+//    catch (final IOException e) {
+//      throw new RuntimeException(e);
+//    }
+//  }
+
   private static byte[] compress(final byte[] input) {
-    try {
-      final ByteArrayInputStream in = new ByteArrayInputStream(input);
-      final ByteArrayOutputStream out = new ByteArrayOutputStream();
-      final Encoder encoder = new Encoder();
-      encoder.SetAlgorithm(2);
-      encoder.SetDictionarySize(1 << 23);
-      encoder.SetNumFastBytes(128);
-      encoder.SetMatchFinder(1);
-      encoder.SetLcLpPb(3, 0, 2);
-      encoder.SetEndMarkerMode(true);
-      encoder.WriteCoderProperties(out);
-      for (int i=0; i<8; i++) {
-        out.write((int) ((long) -1 >>> (8 * i)) & 0xFF);
-      }
-      encoder.Code(in, out, -1, -1, null);
-      out.flush();
-      out.close();
-      return out.toByteArray();
-    }
-    catch (final IOException e) {
-      throw new RuntimeException(e);
-    }
+    return new BrotliStreamCompressor(Brotli.DEFAULT_PARAMETER).compressArray(input, true);
+  }
+
+  static {
+    BrotliLibraryLoader.loadBrotli();
   }
 
 }
